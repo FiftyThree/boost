@@ -1,0 +1,30 @@
+From 612632886f8683d3a8772db0a3c4c8a2afb3a287 Mon Sep 17 00:00:00 2001
+From: Scott Dixon <scottd@fiftythree.com>
+Date: Tue, 6 Oct 2015 21:39:50 -0700
+Subject: [PATCH] Patching our boost implementation for Android.
+
+Watch the status of https://code.google.com/p/android/issues/detail?id=79483 for fix.
+
+Basically, the version of libc++ in version 10e of the Android NDK is missing the ABI::__cxa_demangle
+method which is part of the c++11 standard.
+---
+ boost/core/demangle.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/boost/core/demangle.hpp b/boost/core/demangle.hpp
+index eebd0ce..c24807b 100644
+--- a/boost/core/demangle.hpp
++++ b/boost/core/demangle.hpp
+@@ -66,7 +66,8 @@ public:
+ };
+ 
+ 
+-#if defined( BOOST_CORE_HAS_CXXABI_H )
++// Watch https://code.google.com/p/android/issues/detail?id=79483 for fix.
++#if defined( BOOST_CORE_HAS_CXXABI_H ) and !defined(ANDROID_NDK)
+ 
+ inline char const * demangle_alloc( char const * name ) BOOST_NOEXCEPT
+ {
+-- 
+2.3.2
+

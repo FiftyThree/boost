@@ -66,7 +66,8 @@ public:
 };
 
 
-#if defined( BOOST_CORE_HAS_CXXABI_H )
+// Watch https://code.google.com/p/android/issues/detail?id=79483 for fix.
+#if defined( BOOST_CORE_HAS_CXXABI_H ) and !defined(ANDROID_NDK)
 
 inline char const * demangle_alloc( char const * name ) BOOST_NOEXCEPT
 {
