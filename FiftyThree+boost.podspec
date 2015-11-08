@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
   s.requires_arc = false
 
   s.header_mappings_dir = '.'
-  s.preserve_paths = 'boost/**/*.hpp'
-  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/FiftyThree+boost"' }
+  s.preserve_paths = 'boost/**/*.{h,hpp}'
+  s.user_target_xcconfig = { 'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/FiftyThree+boost"' }
+
 end
