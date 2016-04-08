@@ -12,13 +12,18 @@ VERBOSE = False
 
 BOOST_LIBS     = ('chrono', 'thread', 'system')
 BOOST_HEADERS  = (
-    'exception',
-    'optional',
+    'algorithm',
     'any',
+    'exception',
+    'iostreams',
+    'optional',
+    'typeof',
     'variant',
-    'flat_map',
-    'flat_set',
-    'circular_buffer'
+    'boost/circular_buffer.hpp',
+    'boost/container/flat_map.hpp',
+    'boost/container/flat_set.hpp',
+    'boost/scope_exit.hpp',
+    'boost/uuid/sha1.hpp'
     )
 
 #-------------------------------------------------------------------------------
@@ -374,4 +379,5 @@ def main():
     # Remove build artifacts
     clean()
 
-if __name__ == '__main__': main()
+if __name__ == '__main__': 
+    main()
