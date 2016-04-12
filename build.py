@@ -8,7 +8,7 @@ import subprocess
 import sys
 import traceback
 
-VERBOSE = True
+VERBOSE = False
 
 # Compiler
 COMPILER   = 'clang++'
@@ -18,6 +18,8 @@ STD_LIB    = 'libc++'
 # Operating Systems
 IOS_MIN_VERSION = '8.0'
 OSX_MIN_VERSION = '10.9'
+
+# Platforms
 PLATFORMS = ['ios', 'simulator', 'osx']
 
 # Architectures
@@ -128,74 +130,6 @@ def shell_pipe(callback, cmd, redirect_stderr_to_stdout = True):
 
 #-------------------------------------------------------------------------------
 #
-# Constants
-#
-#-------------------------------------------------------------------------------
-
-
-# XCODE_ROOT                 = shell_output('xcode-select -print-path')
-# IOS_SDK_VERSION            = shell_output('xcrun -sdk iphoneos --show-sdk-version')
-# OSX_SDK_VERSION            = shell_output('xcrun -sdk macosx --show-sdk-version')
-# IOS_SIMULATOR_ROOT         = os.path.join(XCODE_ROOT, 'Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator{}.sdk'.format(IOS_SDK_VERSION))
-# ARCHITECTURES              = ('armv7', 'arm64', 'i386', 'x86_64')
-
-# BUILD_DIR                  = os.path.join(os.getcwd(), 'build')
-
-# BOOST_VERSION_PERIOD       = '1.60.0'
-# BOOST_VERSION_UNDERSCORE   = '1_60_0'
-# BOOST_TARBALL_PATH         = os.path.join(BUILD_DIR, 'boost_{}.tar.bz2'.format(BOOST_VERSION_UNDERSCORE))
-# BOOST_TARBALL_URL          = 'http://sourceforge.net/projects/boost/files/boost/{}/boost_{}.tar.bz2/download'.format(BOOST_VERSION_PERIOD, BOOST_VERSION_UNDERSCORE)
-# BOOST_ROOT                 = os.path.join(BUILD_DIR, 'boost_{}'.format(BOOST_VERSION_UNDERSCORE))
-# BOOST_INCLUDE_DIR          = os.path.join(BOOST_ROOT, 'boost')
-
-# OUTPUT_DIR                 = os.getcwd()
-# OUTPUT_DIR_SRC             = os.path.join(OUTPUT_DIR, 'include/boost')
-# OUTPUT_DIR_LIB             = os.path.join(OUTPUT_DIR, 'lib')
-
-# BUILD_SRC_DIR              = os.path.join(BUILD_DIR, 'src')
-# BUILD_IOS_LIB_DIR          = os.path.join(BUILD_DIR, 'libs/boost/lib')
-# BUILD_IOS_INCLUDE_DIR      = os.path.join(BUILD_DIR, 'libs/boost/include/boost')
-# BUILD_IOS_PREFIX_DIR       = os.path.join(BUILD_DIR, 'ios/prefix')
-
-# NUM_THREADS                = 16
-# CPP_FLAGS                  = ' '.join((
-#                             '-fPIC', 
-#                             '-DBOOST_SP_USE_SPINLOCK',
-#                             '-std={}'.format(CPP_STD),
-#                             '-stdlib={}'.format(STD_LIB),
-#                             '-miphoneos-version-min={}'.format(IOS_MIN_VERSION),
-#                             '-fembed-bitcode',
-#                             '-fvisibility=hidden',
-#                             '-fvisibility-inlines-hidden'
-#                             ))
-# CROSS_TOP_IOS              = '{}/Platforms/iPhoneOS.platform/Developer'.format(XCODE_ROOT)
-# CROSS_SDK_IOS              = 'iPhoneOS{}.sdk'.format(IOS_SDK_VERSION)
-# CROSS_TOP_SIM              = '{}/Platforms/iPhoneSimulator.platform/Developer'.format(XCODE_ROOT)
-# CROSS_SDK_SIM              = 'iPhoneSimulator{}.sdk'.format(IOS_SDK_VERSION)
-
-# BOOST_CONFIG_FILE          = os.path.join(BOOST_ROOT, 'tools/build/example/user-config.jam')
-# USER_CONFIG_FILE           = os.path.join(BOOST_ROOT, 'user-config.jam')
-# USER_CONFIG_FILE_CONTENTS  = """using darwin : {ios_sdk_version}~iphone
-# : {xcode_root}/Toolchains/XcodeDefault.xctoolchain/usr/bin/{compiler} -arch armv7 -arch arm64 {cpp_flags} "-isysroot {cross_top_ios}/SDKs/{cross_sdk_ios}" -I{cross_top_ios}/SDKs/{cross_sdk_ios}/usr/include/
-# : <striper> <root>{xcode_root}/Platforms/iPhoneOS.platform/Developer
-# : <architecture>arm <target-os>iphone
-# ;
-# using darwin : {ios_sdk_version}~iphonesim
-# : {xcode_root}/Toolchains/XcodeDefault.xctoolchain/usr/bin/{compiler} -arch i386 -arch x86_64 {cpp_flags} "-isysroot {cross_top_sim}/SDKs/{cross_sdk_sim}" -I{cross_top_sim}/SDKs/{cross_sdk_sim}/usr/include/
-# : <striper> <root>{xcode_root}/Platforms/iPhoneSimulator.platform/Developer
-# : <architecture>x86 <target-os>iphone
-# ;
-# """.format(compiler=COMPILER,
-#            ios_sdk_version=IOS_SDK_VERSION, 
-#            xcode_root=XCODE_ROOT,
-#            cross_top_ios=CROSS_TOP_IOS,
-#            cross_sdk_ios=CROSS_SDK_IOS,
-#            cross_top_sim=CROSS_TOP_SIM,
-#            cross_sdk_sim=CROSS_SDK_SIM,
-#            cpp_flags=CPP_FLAGS)
-
-#-------------------------------------------------------------------------------
-#
 # Boost
 #
 #-------------------------------------------------------------------------------
@@ -210,6 +144,7 @@ class BuildEnv:
         self.osx_sdk_version = shell_output('xcrun -sdk macosx --show-sdk-version')
         self.ios_simulator_root = os.path.join(self.xcode_root, 'Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator{}.sdk'.format(self.ios_sdk_version))
         self.output_lib_dir = os.path.join(root, 'lib')
+        self.output_src_dir = os.path.join(root, 'include/boost')
 
     def resolve_path(self, relative_path):
         return os.path.join(self.root, relative_path)
@@ -225,7 +160,7 @@ class BuildEnv:
     def prepare(self):
         self.make_dir('')
 
-    def clean(self):
+    def cleanup(self):
         print 'Cleaning up {}'.format(self.root)
         if (os.path.isdir(self.root)):
             shutil.rmtree(self.root)
@@ -534,29 +469,43 @@ class Packager:
         self.create_fat_libs()
         self.install()
 
-def bcp():
-    cwd = os.getcwd()
-    os.chdir(BOOST_ROOT)
+class Headers:
 
-    bcp_path = os.path.join(BOOST_ROOT, 'dist/bin/bcp')
-    if not os.path.isfile(bcp_path):
-        print 'Building bcp'
-        shell('./b2 tools/bcp')
-        if not os.path.isfile(bcp_path):
+    def __init__(self, build_env, boost_source):
+        self.build_env = build_env
+        self.boost_source = boost_source
+        self.bcp_path = self.boost_source.resolve_path('dist/bin/bcp')
+        self.output_src_dir = self.build_env.resolve_path('src')
+
+    def build_bcp(self):
+        if os.path.isfile(self.bcp_path):
+            print 'Found bcp: {}'.format(self.bcp_path)
+        else:
+            self.build_env.push_dir(self.boost_source.root)
+            print 'Building bcp'
+            shell('./b2 tools/bcp')
+            self.build_env.pop_dir()
+        if not os.path.isfile(self.bcp_path):
             print 'Unable to build bcp'
             sys.exit(1)
 
-    tmp_dir = os.path.join(BOOST_ROOT, 'tmp')
-    make_dir(tmp_dir)
-    print 'Extracting {}'.format(' '.join(BOOST_LIBS + BOOST_HEADERS))
-    shell('{} {} {}'.format(bcp_path, ' '.join(BOOST_LIBS + BOOST_HEADERS), tmp_dir))
+    def extract_headers(self):
+        self.build_env.push_dir(self.boost_source.root)
+        self.build_env.make_dir(self.output_src_dir)
+        dependencies = BOOST_LIBS + BOOST_HEADERS
+        print 'Extracting {}'.format(', '.join(dependencies))
+        shell('{} {} {}'.format(self.bcp_path, ' '.join(dependencies), self.output_src_dir))
+        self.build_env.pop_dir()
 
-    if os.path.isdir(OUTPUT_DIR_SRC):
-        shutil.rmtree(OUTPUT_DIR_SRC)
-    print 'Installing headers in {}'.format(OUTPUT_DIR_SRC)
-    shutil.copytree(os.path.join(tmp_dir, 'boost'), OUTPUT_DIR_SRC)
+    def install_headers(self):
+        if os.path.isdir(self.build_env.output_src_dir):
+            shutil.rmtree(self.build_env.output_src_dir)
+        shutil.copytree(os.path.join(self.output_src_dir, 'boost'), self.build_env.output_src_dir)
 
-    os.chdir(cwd)
+    def install(self):
+        self.build_bcp()
+        self.extract_headers()
+        self.install_headers()
 
 #-------------------------------------------------------------------------------
 #
@@ -584,15 +533,13 @@ if __name__ == '__main__':
     # Build each platform's targets
     for platform in PLATFORMS:
         for target in tasks[platform]:
-            build_task = BuildTask(build_env, boost_source, platform, target)
-            build_task.run()
+            BuildTask(build_env, boost_source, platform, target).run()
 
-    packager = Packager(build_env, boost_source)
-    packager.run()
+    # Package and install the fat libs
+    Packager(build_env, boost_source).run()
 
-    # Package and install
-    # package()
-    # bcp()
+    # Install the required headers using bcp
+    Headers(build_env, boost_source).install()
 
     # Remove build artifacts
-    # clean()
+    build_env.cleanup()
