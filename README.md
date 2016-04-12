@@ -1,18 +1,10 @@
-This is a mirror of boost source we use at FiftyThree.
+This is a mirror of the Boost source we use at FiftyThree, including pre-built static libraries for iOS and OS X containing the following Boost libraries:
+* Boost.Thread
+* Boost.Chrono
+* Boost.System
 
-Updating:
+The `include/boost` directory contains all the headers for these non header-only libraries, as well as the header-only dependencies for the modules and files listed at the top of the `build.py` script.
 
-1. Download boost source.
-2. Build bcp (http://www.boost.org/doc/libs/1_57_0/tools/bcp/doc/html/index.html) via 
-```
-./bootstrap.sh
-./b2 tools/bcp
-```
-3. OSX binary now is in bin.v2/tools/bcp/darwin-4.2.1/release/link-static/bcp
-4. Copy, the syntax is bcp module outputpath
+The fat lib `lib/ios/libboost.a` contains the libraries listed above, compiled for **armv7** and **arm64**, as well as **i386** and **x86_64** for simulator compatibility. These were compiled with **bitcode enabled** and a minimum iOS version of **8.0** by the **iPhoneOS9.3.sdk** and **iPhoneSimulator9.3.sdk**.
 
-```
-bcp  algorithm any bimap bind circular_buffer container current_function exception exception/exception iostreams numeric optional scope_exit uuid variant type_index
-```
-5. Update the submodule.
-
+The fat lib `lib/osx/libboost.a` contains the libraries listed above, compiled for **i386** and **x86_64**. These were compiled with a minimum OS X version of **10.9** by the **MacOSX10.11sdk**.
