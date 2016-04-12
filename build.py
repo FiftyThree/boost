@@ -18,6 +18,7 @@ STD_LIB    = 'libc++'
 # Operating Systems
 IOS_MIN_VERSION = '8.0'
 OSX_MIN_VERSION = '10.10'
+PLATFORMS = ['ios', 'simulator', 'osx']
 
 # Architectures
 ARCHITECTURES = {
@@ -200,6 +201,7 @@ using darwin : {ios_sdk_version}~iphonesim
 #-------------------------------------------------------------------------------
 
 class BuildEnv:
+
     def __init__(self, root):
         self.root = root
         self.dir_stack = []
@@ -240,6 +242,7 @@ class BuildEnv:
             self.cd(directory)
 
 class BoostSource:
+
     def __init__(self, build_env, version):
         self.build_env = build_env
         self.version = version
@@ -332,6 +335,7 @@ using darwin : {osx_sdk_version}~osx
         self.create_config()
 
 class BuildTask:
+
     def __init__(self, build_env, boost_source, platform, target='stage'):
         self.build_env = build_env
         self.boost_source = boost_source
@@ -348,7 +352,7 @@ class BuildTask:
         return [
             '-j16',
             '--build-dir={}'.format(self.relative_build_dir),
-            '--stage-dir={}'.format(self.relative_stage_dir),
+            '--stagedir={}'.format(self.relative_stage_dir),
             '--prefix={}'.format(self.relative_prefix_dir),
             'linkflags="-stdlib={}"'.format(STD_LIB),
             'link=static',
@@ -441,11 +445,30 @@ class BuildTask:
         shell('./b2 {}'.format(' '.join(self.build_args())))
         self.build_env.pop_dir()
 
-def prepare():
-    make_dir(OUTPUT_DIR_LIB)
-    shutil.copyfile(BOOST_CONFIG_FILE, USER_CONFIG_FILE)
-    with open(USER_CONFIG_FILE, 'a') as f:
-        f.write(USER_CONFIG_FILE_CONTENTS)
+class Packager:
+
+    def __init__(self, build_env, boost_source):
+        self.build_env = build_env
+        self.boost_source = boost_source
+        self.ios_lib_dir = build_env.resolve_path(os.path.join('lib', 'ios'))
+        self.osx_lib_dir = build_env.resolve_path(os.path.join('lib', 'osx'))
+
+    def get_libs(self):
+        self.build_env.push_dir(self.boost_source.root)
+        lib_dirs = list()
+        for platform in PLATFORMS:
+            build_task = BuildTask(self.build_env, self.boost_source, platform)
+            lib_dirs.append(os.path.join(build_task.relative_stage_dir, 'lib'))
+        all_libs = set()
+        for lib_dir in lib_dirs:
+            libs = [lib for lib in os.listdir(lib_dir) if os.path.isfile(os.path.join(lib_dir, lib))]
+            all_libs.update(set(libs))
+        self.build_env.pop_dir()
+        return list(all_libs)
+
+    def run(self):
+        all_libs = self.get_libs()
+        print all_libs
 
 def platform_for_arch(arch):
     if arch in ('armv7', 'arm64'):
@@ -549,13 +572,15 @@ if __name__ == '__main__':
         "simulator": ['stage'],
         "osx": ['stage'],
     }
-    platforms = tasks.keys()
 
     # Build each platform's targets
-    for platform in platforms:
+    for platform in PLATFORMS:
         for target in tasks[platform]:
             build_task = BuildTask(build_env, boost_source, platform, target)
             build_task.run()
+
+    packager = Packager(build_env, boost_source)
+    packager.run()
 
     # Package and install
     # package()
