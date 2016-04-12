@@ -330,7 +330,7 @@ class BuildTask:
         return [
             '-std={}'.format(CPP_STD),
             '-stdlib={}'.format(STD_LIB),
-            '-fvisibility=hidden',
+            '-fvisibility=default',
             '-fvisibility-inlines-hidden',
             '-fPIC', 
             '-DBOOST_SP_USE_SPINLOCK',
