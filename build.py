@@ -17,14 +17,14 @@ STD_LIB    = 'libc++'
 
 # Operating Systems
 IOS_MIN_VERSION = '8.0'
-OSX_MIN_VERSION = '10.10'
+OSX_MIN_VERSION = '10.9'
 PLATFORMS = ['ios', 'simulator', 'osx']
 
 # Architectures
 ARCHITECTURES = {
-    'ios': ('armv7', 'arm64'),
-    'simulator': ('i386', 'x86_64'),
-    'osx': ('i386', 'x86_64')
+    'ios': ['armv7', 'arm64'],
+    'simulator': ['i386', 'x86_64'],
+    'osx': ['i386', 'x86_64'],
 }
 
 BOOST_VERSION  = '1.60.0'
@@ -133,66 +133,66 @@ def shell_pipe(callback, cmd, redirect_stderr_to_stdout = True):
 #-------------------------------------------------------------------------------
 
 
-XCODE_ROOT                 = shell_output('xcode-select -print-path')
-IOS_SDK_VERSION            = shell_output('xcrun -sdk iphoneos --show-sdk-version')
-OSX_SDK_VERSION            = shell_output('xcrun -sdk macosx --show-sdk-version')
-IOS_SIMULATOR_ROOT         = os.path.join(XCODE_ROOT, 'Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator{}.sdk'.format(IOS_SDK_VERSION))
-ARCHITECTURES              = ('armv7', 'arm64', 'i386', 'x86_64')
+# XCODE_ROOT                 = shell_output('xcode-select -print-path')
+# IOS_SDK_VERSION            = shell_output('xcrun -sdk iphoneos --show-sdk-version')
+# OSX_SDK_VERSION            = shell_output('xcrun -sdk macosx --show-sdk-version')
+# IOS_SIMULATOR_ROOT         = os.path.join(XCODE_ROOT, 'Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator{}.sdk'.format(IOS_SDK_VERSION))
+# ARCHITECTURES              = ('armv7', 'arm64', 'i386', 'x86_64')
 
-BUILD_DIR                  = os.path.join(os.getcwd(), 'build')
+# BUILD_DIR                  = os.path.join(os.getcwd(), 'build')
 
-BOOST_VERSION_PERIOD       = '1.60.0'
-BOOST_VERSION_UNDERSCORE   = '1_60_0'
-BOOST_TARBALL_PATH         = os.path.join(BUILD_DIR, 'boost_{}.tar.bz2'.format(BOOST_VERSION_UNDERSCORE))
-BOOST_TARBALL_URL          = 'http://sourceforge.net/projects/boost/files/boost/{}/boost_{}.tar.bz2/download'.format(BOOST_VERSION_PERIOD, BOOST_VERSION_UNDERSCORE)
-BOOST_ROOT                 = os.path.join(BUILD_DIR, 'boost_{}'.format(BOOST_VERSION_UNDERSCORE))
-BOOST_INCLUDE_DIR          = os.path.join(BOOST_ROOT, 'boost')
+# BOOST_VERSION_PERIOD       = '1.60.0'
+# BOOST_VERSION_UNDERSCORE   = '1_60_0'
+# BOOST_TARBALL_PATH         = os.path.join(BUILD_DIR, 'boost_{}.tar.bz2'.format(BOOST_VERSION_UNDERSCORE))
+# BOOST_TARBALL_URL          = 'http://sourceforge.net/projects/boost/files/boost/{}/boost_{}.tar.bz2/download'.format(BOOST_VERSION_PERIOD, BOOST_VERSION_UNDERSCORE)
+# BOOST_ROOT                 = os.path.join(BUILD_DIR, 'boost_{}'.format(BOOST_VERSION_UNDERSCORE))
+# BOOST_INCLUDE_DIR          = os.path.join(BOOST_ROOT, 'boost')
 
-OUTPUT_DIR                 = os.getcwd()
-OUTPUT_DIR_SRC             = os.path.join(OUTPUT_DIR, 'include/boost')
-OUTPUT_DIR_LIB             = os.path.join(OUTPUT_DIR, 'lib')
+# OUTPUT_DIR                 = os.getcwd()
+# OUTPUT_DIR_SRC             = os.path.join(OUTPUT_DIR, 'include/boost')
+# OUTPUT_DIR_LIB             = os.path.join(OUTPUT_DIR, 'lib')
 
-BUILD_SRC_DIR              = os.path.join(BUILD_DIR, 'src')
-BUILD_IOS_LIB_DIR          = os.path.join(BUILD_DIR, 'libs/boost/lib')
-BUILD_IOS_INCLUDE_DIR      = os.path.join(BUILD_DIR, 'libs/boost/include/boost')
-BUILD_IOS_PREFIX_DIR       = os.path.join(BUILD_DIR, 'ios/prefix')
+# BUILD_SRC_DIR              = os.path.join(BUILD_DIR, 'src')
+# BUILD_IOS_LIB_DIR          = os.path.join(BUILD_DIR, 'libs/boost/lib')
+# BUILD_IOS_INCLUDE_DIR      = os.path.join(BUILD_DIR, 'libs/boost/include/boost')
+# BUILD_IOS_PREFIX_DIR       = os.path.join(BUILD_DIR, 'ios/prefix')
 
-NUM_THREADS                = 16
-CPP_FLAGS                  = ' '.join((
-                            '-fPIC', 
-                            '-DBOOST_SP_USE_SPINLOCK',
-                            '-std={}'.format(CPP_STD),
-                            '-stdlib={}'.format(STD_LIB),
-                            '-miphoneos-version-min={}'.format(IOS_MIN_VERSION),
-                            '-fembed-bitcode',
-                            '-fvisibility=hidden',
-                            '-fvisibility-inlines-hidden'
-                            ))
-CROSS_TOP_IOS              = '{}/Platforms/iPhoneOS.platform/Developer'.format(XCODE_ROOT)
-CROSS_SDK_IOS              = 'iPhoneOS{}.sdk'.format(IOS_SDK_VERSION)
-CROSS_TOP_SIM              = '{}/Platforms/iPhoneSimulator.platform/Developer'.format(XCODE_ROOT)
-CROSS_SDK_SIM              = 'iPhoneSimulator{}.sdk'.format(IOS_SDK_VERSION)
+# NUM_THREADS                = 16
+# CPP_FLAGS                  = ' '.join((
+#                             '-fPIC', 
+#                             '-DBOOST_SP_USE_SPINLOCK',
+#                             '-std={}'.format(CPP_STD),
+#                             '-stdlib={}'.format(STD_LIB),
+#                             '-miphoneos-version-min={}'.format(IOS_MIN_VERSION),
+#                             '-fembed-bitcode',
+#                             '-fvisibility=hidden',
+#                             '-fvisibility-inlines-hidden'
+#                             ))
+# CROSS_TOP_IOS              = '{}/Platforms/iPhoneOS.platform/Developer'.format(XCODE_ROOT)
+# CROSS_SDK_IOS              = 'iPhoneOS{}.sdk'.format(IOS_SDK_VERSION)
+# CROSS_TOP_SIM              = '{}/Platforms/iPhoneSimulator.platform/Developer'.format(XCODE_ROOT)
+# CROSS_SDK_SIM              = 'iPhoneSimulator{}.sdk'.format(IOS_SDK_VERSION)
 
-BOOST_CONFIG_FILE          = os.path.join(BOOST_ROOT, 'tools/build/example/user-config.jam')
-USER_CONFIG_FILE           = os.path.join(BOOST_ROOT, 'user-config.jam')
-USER_CONFIG_FILE_CONTENTS  = """using darwin : {ios_sdk_version}~iphone
-: {xcode_root}/Toolchains/XcodeDefault.xctoolchain/usr/bin/{compiler} -arch armv7 -arch arm64 {cpp_flags} "-isysroot {cross_top_ios}/SDKs/{cross_sdk_ios}" -I{cross_top_ios}/SDKs/{cross_sdk_ios}/usr/include/
-: <striper> <root>{xcode_root}/Platforms/iPhoneOS.platform/Developer
-: <architecture>arm <target-os>iphone
-;
-using darwin : {ios_sdk_version}~iphonesim
-: {xcode_root}/Toolchains/XcodeDefault.xctoolchain/usr/bin/{compiler} -arch i386 -arch x86_64 {cpp_flags} "-isysroot {cross_top_sim}/SDKs/{cross_sdk_sim}" -I{cross_top_sim}/SDKs/{cross_sdk_sim}/usr/include/
-: <striper> <root>{xcode_root}/Platforms/iPhoneSimulator.platform/Developer
-: <architecture>x86 <target-os>iphone
-;
-""".format(compiler=COMPILER,
-           ios_sdk_version=IOS_SDK_VERSION, 
-           xcode_root=XCODE_ROOT,
-           cross_top_ios=CROSS_TOP_IOS,
-           cross_sdk_ios=CROSS_SDK_IOS,
-           cross_top_sim=CROSS_TOP_SIM,
-           cross_sdk_sim=CROSS_SDK_SIM,
-           cpp_flags=CPP_FLAGS)
+# BOOST_CONFIG_FILE          = os.path.join(BOOST_ROOT, 'tools/build/example/user-config.jam')
+# USER_CONFIG_FILE           = os.path.join(BOOST_ROOT, 'user-config.jam')
+# USER_CONFIG_FILE_CONTENTS  = """using darwin : {ios_sdk_version}~iphone
+# : {xcode_root}/Toolchains/XcodeDefault.xctoolchain/usr/bin/{compiler} -arch armv7 -arch arm64 {cpp_flags} "-isysroot {cross_top_ios}/SDKs/{cross_sdk_ios}" -I{cross_top_ios}/SDKs/{cross_sdk_ios}/usr/include/
+# : <striper> <root>{xcode_root}/Platforms/iPhoneOS.platform/Developer
+# : <architecture>arm <target-os>iphone
+# ;
+# using darwin : {ios_sdk_version}~iphonesim
+# : {xcode_root}/Toolchains/XcodeDefault.xctoolchain/usr/bin/{compiler} -arch i386 -arch x86_64 {cpp_flags} "-isysroot {cross_top_sim}/SDKs/{cross_sdk_sim}" -I{cross_top_sim}/SDKs/{cross_sdk_sim}/usr/include/
+# : <striper> <root>{xcode_root}/Platforms/iPhoneSimulator.platform/Developer
+# : <architecture>x86 <target-os>iphone
+# ;
+# """.format(compiler=COMPILER,
+#            ios_sdk_version=IOS_SDK_VERSION, 
+#            xcode_root=XCODE_ROOT,
+#            cross_top_ios=CROSS_TOP_IOS,
+#            cross_sdk_ios=CROSS_SDK_IOS,
+#            cross_top_sim=CROSS_TOP_SIM,
+#            cross_sdk_sim=CROSS_SDK_SIM,
+#            cpp_flags=CPP_FLAGS)
 
 #-------------------------------------------------------------------------------
 #
@@ -203,12 +203,13 @@ using darwin : {ios_sdk_version}~iphonesim
 class BuildEnv:
 
     def __init__(self, root):
-        self.root = root
+        self.root = os.path.join(root, 'build')
         self.dir_stack = []
         self.xcode_root = shell_output('xcode-select -print-path')
         self.ios_sdk_version = shell_output('xcrun -sdk iphoneos --show-sdk-version')
         self.osx_sdk_version = shell_output('xcrun -sdk macosx --show-sdk-version')
         self.ios_simulator_root = os.path.join(self.xcode_root, 'Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator{}.sdk'.format(self.ios_sdk_version))
+        self.output_lib_dir = os.path.join(root, 'lib')
 
     def resolve_path(self, relative_path):
         return os.path.join(self.root, relative_path)
@@ -216,7 +217,8 @@ class BuildEnv:
     def make_dir(self, relative_path):
         path = self.resolve_path(relative_path)
         if not os.path.isdir(path):
-            print 'Creating {}'.format(path)
+            if VERBOSE:
+                print 'Creating {}'.format(path)
             os.makedirs(path)
         return path
 
@@ -229,7 +231,8 @@ class BuildEnv:
             shutil.rmtree(self.root)
 
     def cd(self, path):
-        print 'cd {}'.format(path)
+        if VERBOSE:
+            print 'cd {}'.format(path)
         os.chdir(path)
 
     def push_dir(self, relative_path):
@@ -450,8 +453,10 @@ class Packager:
     def __init__(self, build_env, boost_source):
         self.build_env = build_env
         self.boost_source = boost_source
-        self.ios_lib_dir = build_env.resolve_path(os.path.join('lib', 'ios'))
-        self.osx_lib_dir = build_env.resolve_path(os.path.join('lib', 'osx'))
+        self.output_lib_dir = self.build_env.resolve_path('lib')
+        self.ios_lib_dir = os.path.join(self.output_lib_dir, 'ios')
+        self.osx_lib_dir = os.path.join(self.output_lib_dir, 'osx')
+        self.lib_name = 'libboost.a'
 
     def get_libs(self):
         self.build_env.push_dir(self.boost_source.root)
@@ -466,65 +471,68 @@ class Packager:
         self.build_env.pop_dir()
         return list(all_libs)
 
+    def separate_architectures(self, all_libs):
+        self.build_env.push_dir(self.boost_source.root)
+        for platform in PLATFORMS:
+            build_task = BuildTask(self.build_env, self.boost_source, platform)
+            input_dir = os.path.join(build_task.relative_stage_dir, 'lib')
+            output_dir = self.ios_lib_dir if platform in ['ios', 'simulator'] else self.osx_lib_dir
+            sdk = 'iphoneos' if platform in ['ios', 'simulator'] else 'macosx'
+            self.build_env.make_dir(output_dir)
+            for lib in all_libs:
+                input_path = os.path.join(input_dir, lib)
+                if os.path.isfile(input_path):
+                    for arch in ARCHITECTURES[platform]:
+                        arch_dir = os.path.join(output_dir, arch)
+                        self.build_env.make_dir(arch_dir)
+                        # Split the fat libs into their architecture-specific libs
+                        output_path = os.path.join(arch_dir, lib)
+                        lipo_command = 'lipo "{}" -thin {} -o "{}"'.format(input_path, arch, output_path)
+                        shell('xcrun --sdk {} {}'.format(sdk, lipo_command))
+                        # Decompose the architecture-specific libs
+                        obj_dir = os.path.join(arch_dir, 'obj')
+                        self.build_env.make_dir(obj_dir)
+                        self.build_env.push_dir(obj_dir)
+                        shell('ar -x ../{}'.format(lib))
+                        obj_files = [obj_file for obj_file in os.listdir('./') if os.path.isfile(obj_file) and obj_file.endswith('.o')]
+                        self.build_env.pop_dir()
+                        # Create an architecture-specific fat lib
+                        self.build_env.push_dir(arch_dir)
+                        if os.path.isfile(self.lib_name):
+                            os.remove(self.lib_name)
+                        ar_command = 'ar crus {} {}'.format(self.lib_name, ' '.join([os.path.join('obj', obj_file) for obj_file in obj_files]))
+                        shell('xcrun --sdk {} {}'.format(sdk, ar_command))
+                        self.build_env.pop_dir()
+        self.build_env.pop_dir()
+
+    def create_fat_libs(self):
+        for platform_dir in [self.ios_lib_dir, self.osx_lib_dir]:
+            self.build_env.push_dir(platform_dir)
+            arch_libs = []
+            for arch_dir in [arch_dir for arch_dir in os.listdir('./') if os.path.isdir(arch_dir)]:
+                arch_lib = os.path.join(arch_dir, self.lib_name)
+                if os.path.isfile(arch_lib):
+                    arch_libs.append(arch_lib)
+            if os.path.isfile(self.lib_name):
+                os.remove(self.lib_name)
+            shell('lipo -c {} -output {}'.format(' '.join(arch_libs), self.lib_name))
+            self.build_env.pop_dir()
+
+    def install(self):
+        self.build_env.push_dir(self.build_env.root)
+        for platform_dir in [self.ios_lib_dir, self.osx_lib_dir]:
+            fat_lib_path = os.path.join(platform_dir, self.lib_name)
+            relative_fat_lib_path = os.path.relpath(fat_lib_path, self.output_lib_dir)
+            install_path = os.path.join(self.build_env.output_lib_dir, relative_fat_lib_path)
+            self.build_env.make_dir(os.path.dirname(install_path))
+            shutil.copyfile(fat_lib_path, install_path)
+        self.build_env.pop_dir()
+
     def run(self):
         all_libs = self.get_libs()
-        print all_libs
-
-def platform_for_arch(arch):
-    if arch in ('armv7', 'arm64'):
-        return 'iphone'
-    elif arch in ('i386', 'x86_64'):
-        return 'iphonesim'
-    else:
-        print 'Invalid architecture: {}'.format(arch)
-        sys.exit(1)
-
-def sdk_for_platform(platform):
-    if platform == 'iphone':
-        return 'iphoneos'
-    elif platform == 'iphonesim':
-        return 'iphonesimulator'
-    else:
-        print 'Invalid platform: {}'.format(platform)
-        sys.exit(1)         
-
-def package():
-    cwd = os.getcwd()
-    os.chdir(BOOST_ROOT)
-
-    for arch in ARCHITECTURES:
-        make_dir(os.path.join(BUILD_IOS_LIB_DIR, '{}/obj'.format(arch)))
-
-    lib_dir = 'iphone-build/stage/lib'
-    libs = [lib for lib in os.listdir(lib_dir) if os.path.isfile(os.path.join(lib_dir, lib))]
-    
-    for lib in libs:
-        for arch in ARCHITECTURES:
-            inner_cwd = os.getcwd()
-            command = 'lipo "{platform}-build/stage/lib/{name}" -thin {arch} -o "{build_dir}/{arch}/{name}"'.format(platform=platform_for_arch(arch), name=lib, arch=arch, build_dir=BUILD_IOS_LIB_DIR)
-            shell('xcrun --sdk {} {}'.format('iphoneos', command))
-            os.chdir('{}/{}/obj'.format(BUILD_IOS_LIB_DIR, arch))
-            shell('ar -x ../{}'.format(lib))
-            os.chdir(inner_cwd)
-
-    print 'Collecting architecture-specific products'
-    boost_libs = []
-    for arch in ARCHITECTURES:
-        inner_cwd = os.getcwd()
-        os.chdir('{}/{}'.format(BUILD_IOS_LIB_DIR, arch))
-        if os.path.isfile('libboost.a'):
-            os.remove('libboost.a')
-        obj_dir = os.path.join(os.getcwd(), 'obj')
-        obj_files = [os.path.join(obj_dir, obj) for obj in os.listdir('obj') if os.path.isfile(os.path.join(obj_dir, obj)) and obj.endswith('.o')]
-        command = 'ar crus libboost.a {}'.format(' '.join(obj_files))
-        shell('xcrun --sdk {} {}'.format(sdk_for_platform(platform_for_arch(arch)), command))
-        boost_libs.append(os.path.join(os.getcwd(), 'libboost.a'))
-        os.chdir(inner_cwd)
-
-    print 'Creating the fat lib at {}/libboost.a'.format(OUTPUT_DIR_LIB)
-    shell('lipo -c {} -output {}/libboost.a'.format(' '.join(boost_libs), OUTPUT_DIR_LIB))
-
-    os.chdir(cwd)
+        self.separate_architectures(all_libs)
+        self.create_fat_libs()
+        self.install()
 
 def bcp():
     cwd = os.getcwd()
@@ -559,7 +567,7 @@ def bcp():
 if __name__ == '__main__': 
     
     # Prepare the build folder
-    build_env = BuildEnv(os.path.join(os.getcwd(), 'build'))
+    build_env = BuildEnv(os.getcwd())
     build_env.prepare()
 
     # Download and unpack the boost source
